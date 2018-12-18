@@ -12,24 +12,19 @@
 # docker run -d -P --name nodea --hostname nodea node
 #
 FROM ubuntu:18.04
+LABEL maintainer Steve Cote <sdcote@gmail.com>
 
 # Add the minimal packages for an Ansible to connect and manage our configuration
 RUN apt-get update \
-  && apt-get install -y openssh-server iproute2 sudo python2.7 python-pip python3-pip \
-  && mkdir /var/run/sshd \
-  && echo 'root:ansible' | chpasswd \
-  && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-  && sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+  && apt-get install -y openssh-server sudo python2.7 python-pip python3-pip \
+  && mkdir /var/run/sshd 
 
-# Add a non privileged user with SSH keys that Ansible can use for connections
+# Add a non privileged user that Ansible can use for connections
 RUN useradd -m ansible -s /bin/bash \
-  && mkdir -p /home/ansible/.ssh
+ && echo 'ansible:ansible' | chpasswd 
 
-ADD public-key.txt /home/ansible/.ssh/authorized_keys
-
-RUN chown -R ansible /home/ansible/.ssh \
-  && chmod 600 /home/ansible/.ssh/authorized_keys \
-  && echo "ansible ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/ansible \
+# Make sure the ansible user can sudo
+RUN echo "ansible ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/ansible \
   && chmod 0440 /etc/sudoers.d/ansible
 
 # Expose ssh and common ports.

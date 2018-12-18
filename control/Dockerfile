@@ -5,7 +5,7 @@
 #
 # Assuming you built this with the following command:
 #
-# docker build --no-cache -t control .
+# docker build --no-cache -t ansible .
 #
 # You can run this
 #
@@ -28,24 +28,25 @@ LABEL maintainer Steve Cote <sdcote@gmail.com>
 
 # Install Ansible
 RUN apt-get update \
-  && apt-get install -y unzip git software-properties-common \
+  && apt-get install -y software-properties-common \
   && apt-add-repository ppa:ansible/ansible \
   && apt-get update -y \
-  && apt-get install ansible -y \
-  && ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+  && apt-get install ansible -y 
 
 # Install the SSH daemon so we can log into this container and run our playbooks
 RUN apt-get install -y openssh-server \
-  && mkdir /var/run/sshd \
-  && echo 'root:ansible' | chpasswd \
-  && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
-  && sed -i 's/#PermitRootLogin yes/PermitRootLogin yes/' /etc/ssh/sshd_config
+  && mkdir /var/run/sshd 
 
-# This also installs Terraform - should probably put this in a separate Dockerfile
-RUN wget --quiet https://releases.hashicorp.com/terraform/0.11.10/terraform_0.11.10_linux_amd64.zip \
-  && unzip -qq terraform_0.11.10_linux_amd64.zip \
-  && mv terraform /usr/local/bin/ \
-  && rm terraform_0.11.10_linux_amd64.zip
+# Install some helper tools - git, vim, sudo and unzip
+RUN apt-get install -y unzip git sudo vim 
+
+# Add a non privileged user that Ansible can use for connections
+RUN useradd -m ansible -s /bin/bash \
+ && echo 'ansible:ansible' | chpasswd 
+
+# Make sure the ansible user can sudo
+RUN echo "ansible ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/ansible \
+  && chmod 0440 /etc/sudoers.d/ansible
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
