@@ -11,7 +11,8 @@
 #
 # docker run -d -P --name <container_name> <image_name>
 #
-# You can non SSH into the container and use ansible with root:ansible
+# You can non SSH into the container with username:password of ansible:ansible
+# and use Ansible.
 #
 # Consider using volumes for all your local playbooks and inventories so you 
 # don't lose data when you remove the container.
