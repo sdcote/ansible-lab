@@ -27,6 +27,8 @@
 FROM ubuntu:18.04
 LABEL maintainer Steve Cote <sdcote@gmail.com>
 
+COPY proxy.conf /etc/apt/apt.conf.d/proxy.conf
+
 # Install Ansible
 RUN apt-get update \
   && apt-get install -y software-properties-common \

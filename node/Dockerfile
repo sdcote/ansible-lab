@@ -14,6 +14,8 @@
 FROM ubuntu:18.04
 LABEL maintainer Steve Cote <sdcote@gmail.com>
 
+COPY proxy.conf /etc/apt/apt.conf.d/proxy.conf
+
 # Add the minimal packages for an Ansible to connect and manage our configuration
 RUN apt-get update \
   && apt-get install -y openssh-server sudo python2.7 python-pip python3-pip \
