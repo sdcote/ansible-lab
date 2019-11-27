@@ -41,7 +41,7 @@ RUN apt-get install -y openssh-server \
   && mkdir /var/run/sshd 
 
 # Install some helper tools - git, vim, sudo and unzip
-RUN apt-get install -y unzip git sudo vim 
+RUN apt-get install -y python-pip unzip git sudo vim 
 
 # Add a non privileged user that Ansible can use for connections
 RUN useradd -m ansible -s /bin/bash \
